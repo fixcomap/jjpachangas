@@ -4,7 +4,10 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const pool = require('./db');
 const { requiereSesion } = require('./auth');
-const { ErrorValidacion, nuevaPachanga, nombreJugador, nuevoCodigo, esCodigo, repartir } = require('./validar');
+const {
+  ErrorValidacion, nuevaPachanga, nombreJugador, nuevoCodigo, esCodigo, repartir,
+  PLAZO_BAJA_HORAS, bajaHasta, puedeBajarse, nuevoTokenBaja, hashToken,
+} = require('./validar');
 
 // Anotarse es público: límite por IP para que un script no llene la lista.
 const limitadorInscripcion = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: true, legacyHeaders: false });
@@ -29,6 +32,7 @@ async function estado(codigo, usuario) {
     lugar: p.lugar,
     organizador: p.organizador,
     es_organizador: usuario?.id === p.organizador_id,
+    baja_hasta: bajaHasta(p.empieza_en),
     ...repartir(inscripciones, p.cupo),
   };
 }
@@ -92,18 +96,41 @@ router.get('/p/:codigo', manejar(async (req, res) => {
 router.post('/p/:codigo/inscripciones', limitadorInscripcion, manejar(async (req, res) => {
   if (!esCodigo(req.params.codigo)) return res.status(404).json({ error: 'Esta pachanga no existe' });
   const nombre = nombreJugador(req.body?.nombre);
+  const token = nuevoTokenBaja();
+  let id;
   try {
-    const { rowCount } = await pool.query(
-      `INSERT INTO inscripciones (pachanga_id, nombre)
-       SELECT id, $2 FROM pachangas WHERE codigo = $1 AND empieza_en > now()`,
-      [req.params.codigo, nombre]
+    const { rows } = await pool.query(
+      `INSERT INTO inscripciones (pachanga_id, nombre, baja_hash)
+       SELECT id, $2, $3 FROM pachangas WHERE codigo = $1 AND empieza_en > now()
+       RETURNING id`,
+      [req.params.codigo, nombre, hashToken(token)]
     );
-    if (!rowCount) return res.status(410).json({ error: 'Esta pachanga ya pasó o no existe' });
+    if (!rows.length) return res.status(410).json({ error: 'Esta pachanga ya pasó o no existe' });
+    id = rows[0].id;
   } catch (err) {
     if (err.code === '23505') return res.status(409).json({ error: `Ya hay alguien anotado como "${nombre}"` });
     throw err;
   }
-  res.status(201).json(await estado(req.params.codigo, req.usuario));
+  // El token solo viaja esta vez: el front lo guarda en el dispositivo para "No puedo ir".
+  res.status(201).json({ ...(await estado(req.params.codigo, req.usuario)), mi_inscripcion: { id, nombre, token } });
+}));
+
+// "No puedo ir": quien se anotó, con su código de baja, hasta PLAZO_BAJA_HORAS antes.
+router.delete('/p/:codigo/inscripciones/:id', manejar(async (req, res) => {
+  const id = Number(req.params.id);
+  const token = req.get('X-Baja-Token');
+  if (!esCodigo(req.params.codigo) || !Number.isInteger(id) || !token) return res.status(404).json({ error: 'No existe' });
+  const { rows } = await pool.query(
+    `SELECT i.id, p.empieza_en FROM inscripciones i JOIN pachangas p ON p.id = i.pachanga_id
+     WHERE i.id = $1 AND p.codigo = $2 AND i.baja_hash = $3`,
+    [id, req.params.codigo, hashToken(token)]
+  );
+  if (!rows.length) return res.status(404).json({ error: 'No encontramos tu inscripción' });
+  if (!puedeBajarse(rows[0].empieza_en)) {
+    return res.status(403).json({ error: `Faltan menos de ${PLAZO_BAJA_HORAS} horas: ya no te podés bajar. Avisale al organizador.` });
+  }
+  await pool.query('DELETE FROM inscripciones WHERE id = $1', [id]);
+  res.json(await estado(req.params.codigo, req.usuario));
 }));
 
 module.exports = router;

@@ -36,9 +36,22 @@ const nombreJugador = (valor) => texto(valor, 'nombre', 2, 40);
 const nuevoCodigo = () => crypto.randomBytes(8).toString('base64url');
 const esCodigo = (valor) => typeof valor === 'string' && /^[A-Za-z0-9_-]{11}$/.test(valor);
 
+// Cada uno puede bajarse hasta PLAZO_BAJA_HORAS antes del partido; después, solo
+// el organizador lo saca (y así tiene margen para conseguir reemplazo).
+const PLAZO_BAJA_HORAS = 3;
+const bajaHasta = (empiezaEn) => new Date(new Date(empiezaEn).getTime() - PLAZO_BAJA_HORAS * 60 * 60 * 1000);
+const puedeBajarse = (empiezaEn, ahora = new Date()) => ahora < bajaHasta(empiezaEn);
+
+// Código de baja que se entrega al anotarse; en la base, solo su hash.
+const nuevoTokenBaja = () => crypto.randomBytes(24).toString('hex');
+const hashToken = (token) => crypto.createHash('sha256').update(String(token)).digest('hex');
+
 // Por orden de llegada: los primeros `cupo` juegan, el resto son suplentes.
 function repartir(inscripciones, cupo) {
   return { titulares: inscripciones.slice(0, cupo), suplentes: inscripciones.slice(cupo) };
 }
 
-module.exports = { ErrorValidacion, nuevaPachanga, nombreJugador, nuevoCodigo, esCodigo, repartir };
+module.exports = {
+  ErrorValidacion, nuevaPachanga, nombreJugador, nuevoCodigo, esCodigo, repartir,
+  PLAZO_BAJA_HORAS, bajaHasta, puedeBajarse, nuevoTokenBaja, hashToken,
+};
