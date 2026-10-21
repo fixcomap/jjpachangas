@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { pedir, URL_API } from '../api.js';
 import { aIso, dia, hora } from '../fechas.js';
+import Logo from '../componentes/Logo.jsx';
 
 const DEPORTES = ['Fútbol sala', 'Fútbol 7', 'Fútbol 11', 'Pádel', 'Básquet', 'Vóley'];
 
@@ -23,6 +24,7 @@ export default function Inicio() {
     const errorLogin = new URLSearchParams(window.location.search).get('error') === 'login';
     return (
       <main className="hero">
+        <Logo className="logo-hero" />
         <p className="cartel-pre">Armá el</p>
         <h1 className="cartel-grande">Partidito</h1>
         <p>Creás la pachanga, mandás el link por WhatsApp y cada uno se anota con su nombre.</p>

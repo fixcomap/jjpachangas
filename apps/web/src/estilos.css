@@ -29,7 +29,9 @@ body {
   background: radial-gradient(ellipse 90% 45% at 50% -8%, #2b322c 0%, rgba(10, 11, 10, 0) 70%), var(--fondo);
 }
 .app { max-width: 560px; margin: 0 auto; padding: 0 16px 56px; }
-.cabecera { padding: 18px 0 6px; }
+.cabecera { padding: 14px 0 0; }
+.logo-cabecera { display: block; width: 52px; height: auto; }
+.logo-hero { display: block; width: 150px; height: auto; margin: 0 auto 18px; filter: drop-shadow(0 6px 18px rgba(217, 255, 46, 0.15)); }
 .marca { font-family: var(--titulo); font-size: 1.05rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto); text-decoration: none; }
 .marca span { color: var(--neon); }
 h2 { font-family: var(--titulo); font-weight: 400; text-transform: uppercase; letter-spacing: 1px; font-size: 1.3rem; margin: 28px 0 10px; }
@@ -150,7 +152,7 @@ input:focus { outline: 2px solid var(--neon); outline-offset: 1px; }
 .quitar { margin-left: auto; background: none; border: 0; color: var(--rojo); font-size: 1.4rem; cursor: pointer; font-family: system-ui, sans-serif; }
 
 /* ---------- inicio ---------- */
-.hero { text-align: center; padding: 8vh 0 12px; }
+.hero { text-align: center; padding: 3vh 0 12px; }
 .hero > p:not(.cartel-pre) { color: var(--tenue); margin: 18px 0 26px; font-size: 1.05rem; }
 .lista { list-style: none; padding: 0; margin: 0; }
 .lista li a {
