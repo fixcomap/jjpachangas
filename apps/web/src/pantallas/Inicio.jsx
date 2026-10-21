@@ -22,8 +22,9 @@ export default function Inicio() {
   if (!usuario) {
     const errorLogin = new URLSearchParams(window.location.search).get('error') === 'login';
     return (
-      <main className="centro">
-        <h1>Armá el partido en un minuto</h1>
+      <main className="hero">
+        <p className="cartel-pre">Armá el</p>
+        <h1 className="cartel-grande">Partidito</h1>
         <p>Creás la pachanga, mandás el link por WhatsApp y cada uno se anota con su nombre.</p>
         {errorLogin && <p className="error">No se pudo entrar con Google. Probá de nuevo.</p>}
         <a className="boton" href={`${URL_API}/auth/login`}>Entrar con Google</a>
@@ -41,12 +42,16 @@ export default function Inicio() {
       <NuevaPachanga />
       {pachangas.length > 0 && (
         <section>
-          <h2>Tus pachangas</h2>
+          <h2>Tus partiditos</h2>
           <ul className="lista">
             {pachangas.map((p) => (
               <li key={p.codigo}>
                 <a href={`/p/${p.codigo}`}>
-                  <strong>{p.deporte}</strong> · {dia(p.empieza_en)}, {hora(p.empieza_en)} · {p.lugar}
+                  <span>
+                    <strong>{p.lugar}</strong>
+                    <br />
+                    <span className="tenue">{p.deporte} · {dia(p.empieza_en)}, {hora(p.empieza_en)}</span>
+                  </span>
                   <span className="contador">{Math.min(p.anotados, p.cupo)}/{p.cupo}</span>
                 </a>
               </li>
@@ -87,7 +92,7 @@ function NuevaPachanga() {
 
   return (
     <form className="tarjeta" onSubmit={crear}>
-      <h2>Nueva pachanga</h2>
+      <h2>Nuevo partidito</h2>
       <label>
         Deporte
         <input name="deporte" list="deportes" defaultValue="Fútbol sala" required maxLength={40} />
@@ -103,7 +108,7 @@ function NuevaPachanga() {
         <input name="lugar" placeholder="Polideportivo, cancha, dirección…" required maxLength={120} />
       </label>
       {error && <p className="error">{error}</p>}
-      <button className="boton" disabled={enviando}>{enviando ? 'Creando…' : 'Crear y compartir'}</button>
+      <button className="boton" disabled={enviando}>{enviando ? 'Armando…' : 'Armar partidito'}</button>
     </form>
   );
 }

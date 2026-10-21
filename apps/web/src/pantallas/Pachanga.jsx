@@ -71,15 +71,15 @@ export default function Pachanga({ codigo }) {
 
   return (
     <main>
-      <section className="tarjeta">
-        <h1>¿Querés jugar al {p.deporte}?</h1>
-        <p className="detalle">📅 {dia(p.empieza_en)} · 🕘 {hora(p.empieza_en)}</p>
-        <p className="detalle">📍 {p.lugar}</p>
-        <p className="detalle">Organiza {p.organizador}</p>
-        <div className="barra" aria-label={`${anotados} de ${p.cupo}`}>
-          <div style={{ width: `${(anotados / p.cupo) * 100}%` }} />
+      <section className="cartel">
+        <p className="cartel-pre">Partidito en</p>
+        <h1 className={`cartel-grande${p.lugar.length > 16 ? ' largo' : ''}`}>{p.lugar}</h1>
+        <div className="chips">
+          <span>⚽ {p.deporte}</span>
+          <span>📅 {dia(p.empieza_en)}</span>
+          <span>🕘 {hora(p.empieza_en)}</span>
         </div>
-        <p className="contador-grande">{anotados}/{p.cupo} {anotados >= p.cupo ? '· ¡completo!' : ''}</p>
+        <p className="organiza">Organiza {p.organizador}</p>
       </section>
 
       {p.es_organizador && (
@@ -92,7 +92,7 @@ export default function Pachanga({ codigo }) {
       )}
 
       {miNombre ? (
-        <p className="ok">Estás anotado como <strong>{miNombre}</strong>.</p>
+        <p className="anotado">Estás anotado como <strong>{miNombre}</strong> 💪</p>
       ) : (
         <form className="tarjeta" onSubmit={anotarme}>
           <label>
@@ -104,8 +104,11 @@ export default function Pachanga({ codigo }) {
       )}
       {error && <p className="error">{error}</p>}
 
-      <section className="pizarra" aria-label="Lista de jugadores">
-        <h2>{p.deporte} · {anotados}/{p.cupo}</h2>
+      <section className="tiza" aria-label="Lista de jugadores">
+        <div className="tiza-titulo">
+          <h2>{anotados >= p.cupo ? '¡Completo!' : 'Juegan'}</h2>
+          <span className="cuenta">{anotados}/{p.cupo}</span>
+        </div>
         <ol>
           {huecos.map((i, n) => (i ? persona(i, n + 1) : (
             <li key={`libre-${n}`} className="libre">

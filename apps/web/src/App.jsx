@@ -8,7 +8,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="cabecera">
-        <a href="/" className="marca">⚽ Juancito Pachangas</a>
+        <a href="/" className="marca">⚽ Juancito <span>Pachangas</span></a>
       </header>
       {ruta ? <Pachanga codigo={ruta[1]} /> : <Inicio />}
     </div>
