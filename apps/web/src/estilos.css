@@ -115,6 +115,23 @@ input {
 }
 input:focus { outline: 2px solid var(--neon); outline-offset: 1px; }
 .fila { display: flex; gap: 8px; }
+/* Deporte y modalidad: botones tipo píldora; la elegida, en neón. */
+.opciones { border: 0; padding: 0; margin: 12px 0 4px; display: flex; flex-wrap: wrap; gap: 8px; }
+.opciones legend { width: 100%; padding: 0; margin-bottom: 8px; font-size: 0.85rem; color: var(--tenue); text-transform: uppercase; letter-spacing: 0.5px; }
+.opciones button {
+  flex: 1 1 auto;
+  min-width: 88px;
+  padding: 10px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: #0e100f;
+  color: var(--texto);
+  font-size: 1rem;
+  cursor: pointer;
+}
+.opciones button small { display: block; margin-top: 2px; font-size: 0.75rem; color: var(--tenue); }
+.opciones button.activa { border-color: var(--neon); color: var(--neon); box-shadow: inset 0 0 0 1px var(--neon); }
+.opciones button.activa small { color: var(--neon); }
 .fila label { flex: 1; min-width: 0; }
 .anotado {
   margin: 16px 0 0;

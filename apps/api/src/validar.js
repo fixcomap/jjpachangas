@@ -1,6 +1,7 @@
 // Validación de lo que llega del front: nunca se confía en el cliente. Funciones
 // puras (sin base) para poder probarlas con node --test.
 const crypto = require('crypto');
+const MODALIDADES = require('./modalidades');
 
 class ErrorValidacion extends Error {}
 
@@ -14,14 +15,15 @@ function texto(valor, campo, min, max) {
 }
 
 function nuevaPachanga(body, ahora = new Date()) {
-  const cupo = Number(body?.cupo);
-  if (!Number.isInteger(cupo) || cupo < 2 || cupo > 30) throw new ErrorValidacion('cupo: entre 2 y 30');
+  const deporte = String(body?.deporte ?? '');
+  const cupo = MODALIDADES.get(deporte);
+  if (!cupo) throw new ErrorValidacion(`deporte: elegí una de ${[...MODALIDADES.keys()].join(', ')}`);
   const empiezaEn = new Date(body?.empieza_en);
   if (Number.isNaN(empiezaEn.getTime())) throw new ErrorValidacion('empieza_en: fecha y hora inválidas');
   if (empiezaEn < ahora) throw new ErrorValidacion('empieza_en: tiene que ser en el futuro');
   if (empiezaEn - ahora > 366 * 24 * 60 * 60 * 1000) throw new ErrorValidacion('empieza_en: como mucho dentro de un año');
   return {
-    deporte: texto(body?.deporte, 'deporte', 2, 40),
+    deporte,
     cupo,
     empiezaEn,
     lugar: texto(body?.lugar, 'lugar', 2, 120),

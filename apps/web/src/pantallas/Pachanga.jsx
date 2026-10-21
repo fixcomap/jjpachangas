@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { pedir } from '../api.js';
 import { dia, hora } from '../fechas.js';
+import { iconoDe } from '../datos/modalidades.js';
 
 // Página del link público. Cualquiera ve la lista y se anota; el organizador,
 // además, la comparte por WhatsApp y puede sacar a alguien.
@@ -75,7 +76,7 @@ export default function Pachanga({ codigo }) {
         <p className="cartel-pre">Partidito en</p>
         <h1 className={`cartel-grande${p.lugar.length > 16 ? ' largo' : ''}`}>{p.lugar}</h1>
         <div className="chips">
-          <span>⚽ {p.deporte}</span>
+          <span>{iconoDe(p.deporte)} {p.deporte}</span>
           <span>📅 {dia(p.empieza_en)}</span>
           <span>🕘 {hora(p.empieza_en)}</span>
         </div>
