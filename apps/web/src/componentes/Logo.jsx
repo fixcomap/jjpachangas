@@ -21,7 +21,7 @@ function Estrella({ x }) {
 
 export default function Logo({ className, titulo = 'JJ Pachangas' }) {
   return (
-    <svg className={className} viewBox="0 0 200 240" role="img" aria-label={titulo}>
+    <svg className={className} viewBox="0 0 200 240" {...(titulo ? { role: 'img', 'aria-label': titulo } : { 'aria-hidden': true })}>
       <defs>
         <clipPath id="jj-pelota"><circle cx="100" cy="120" r="40" /></clipPath>
         <path id="jj-arco" d="M36 176 Q100 228 164 176" />

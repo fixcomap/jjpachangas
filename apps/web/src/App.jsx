@@ -7,11 +7,18 @@ import Logo from './componentes/Logo.jsx';
 export default function App() {
   const ruta = window.location.pathname.match(/^\/p\/([A-Za-z0-9_-]{11})\/?$/);
   return (
-    <div className="app">
-      <header className="cabecera">
-        <a href="/" className="marca" aria-label="JJ Pachangas, inicio"><Logo className="logo-cabecera" /></a>
-      </header>
-      {ruta ? <Pachanga codigo={ruta[1]} /> : <Inicio />}
-    </div>
+    <>
+      {/* El escudo en grande detrás de todo: decorativo, no se lee ni recibe clics. */}
+      <div className="fondo-escudo" aria-hidden="true"><Logo titulo="" /></div>
+      <div className="app">
+        <header className="cabecera">
+          <a href="/" className="marca" aria-label="JJ Pachangas, inicio">
+            <Logo className="logo-cabecera" titulo="" />
+            <span className="marca-texto">JJ Pachangas</span>
+          </a>
+        </header>
+        {ruta ? <Pachanga codigo={ruta[1]} /> : <Inicio />}
+      </div>
+    </>
   );
 }
