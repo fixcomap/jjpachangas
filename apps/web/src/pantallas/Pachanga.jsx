@@ -54,6 +54,23 @@ export default function Pachanga({ codigo }) {
     }
   }
 
+  // Solo el organizador: agrega a alguien a mano.
+  async function agregar(e) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setError('');
+    try {
+      setP(await pedir(`/pachangas/${codigo}/inscripciones`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre: new FormData(form).get('nombre') }),
+      }));
+      form.reset();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
   async function bajarme() {
     if (!window.confirm(`¿Seguro que no podés ir? Se libera tu lugar.`)) return;
     setError('');
@@ -110,7 +127,15 @@ export default function Pachanga({ codigo }) {
         </section>
       )}
 
-      {mia ? (
+      {p.es_organizador ? (
+        <form className="tarjeta" onSubmit={agregar}>
+          <label>
+            Agregar a alguien
+            <input name="nombre" required minLength={2} maxLength={40} placeholder="Nombre" autoComplete="off" />
+          </label>
+          <button className="boton">{anotados >= p.cupo ? 'Agregar de suplente' : 'Agregar a la lista'}</button>
+        </form>
+      ) : mia ? (
         <div className="anotado">
           <p>Estás anotado como <strong>{mia.nombre}</strong> 💪</p>
           {mia.token && new Date() < new Date(p.baja_hasta) && (
