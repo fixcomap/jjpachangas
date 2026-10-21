@@ -72,6 +72,25 @@ router.post('/pachangas', requiereSesion, manejar(async (req, res) => {
   res.status(201).json(rows[0]);
 }));
 
+// Agregar a alguien a mano (avisó por WhatsApp, en persona...): solo el organizador.
+// Sin código de baja: a esa persona solo la puede sacar el organizador.
+router.post('/pachangas/:codigo/inscripciones', requiereSesion, manejar(async (req, res) => {
+  if (!esCodigo(req.params.codigo)) return res.status(404).json({ error: 'No existe' });
+  const nombre = nombreJugador(req.body?.nombre);
+  try {
+    const { rowCount } = await pool.query(
+      `INSERT INTO inscripciones (pachanga_id, nombre)
+       SELECT id, $2 FROM pachangas WHERE codigo = $1 AND organizador_id = $3 AND empieza_en > now()`,
+      [req.params.codigo, nombre, req.usuario.id]
+    );
+    if (!rowCount) return res.status(404).json({ error: 'No existe o ya pasó' });
+  } catch (err) {
+    if (err.code === '23505') return res.status(409).json({ error: `Ya hay alguien anotado como "${nombre}"` });
+    throw err;
+  }
+  res.status(201).json(await estado(req.params.codigo, req.usuario));
+}));
+
 // Sacar a alguien de la lista (se equivocó de nombre, no viene...): solo el organizador.
 router.delete('/pachangas/:codigo/inscripciones/:id', requiereSesion, manejar(async (req, res) => {
   const id = Number(req.params.id);
