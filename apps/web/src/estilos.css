@@ -141,6 +141,10 @@ input:focus { outline: 2px solid var(--neon); outline-offset: 1px; }
   color: var(--neon);
   text-align: center;
 }
+.anotado p { margin: 0; }
+.anotado small { display: block; margin-top: 8px; color: var(--tenue); }
+.boton.baja { background: transparent; color: var(--rojo); border: 1px solid var(--rojo); font-size: 1rem; padding: 10px; }
+.tiza li.mio .nombre { color: var(--neon); text-shadow: 0 0 6px rgba(217, 255, 46, 0.35); }
 
 /* ---------- lista escrita con tiza ---------- */
 .tiza { margin: 26px 0 8px; }

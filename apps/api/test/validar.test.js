@@ -55,3 +55,21 @@ test('las modalidades del front y de la API coinciden', async () => {
   const delFront = new Map(DEPORTES.flatMap((d) => d.modalidades.map((m) => [m.nombre, m.cupo])));
   assert.deepStrictEqual(delFront, MODALIDADES);
 });
+
+test('plazo para bajarse: hasta 3 h antes del partido', () => {
+  const { puedeBajarse, bajaHasta } = require('../src/validar');
+  const partido = '2026-10-23T19:00:00Z';
+  assert.strictEqual(bajaHasta(partido).toISOString(), '2026-10-23T16:00:00.000Z');
+  assert.ok(puedeBajarse(partido, new Date('2026-10-23T15:59:00Z')));
+  assert.ok(!puedeBajarse(partido, new Date('2026-10-23T16:00:00Z')));
+  assert.ok(!puedeBajarse(partido, new Date('2026-10-23T18:30:00Z')));
+});
+
+test('token de baja: al azar y solo se guarda su hash', () => {
+  const { nuevoTokenBaja, hashToken } = require('../src/validar');
+  const t = nuevoTokenBaja();
+  assert.match(t, /^[0-9a-f]{48}$/);
+  assert.notStrictEqual(t, nuevoTokenBaja());
+  assert.strictEqual(hashToken(t), hashToken(t));
+  assert.notStrictEqual(hashToken(t), t);
+});
