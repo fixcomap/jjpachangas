@@ -24,7 +24,7 @@ export default function Logo({ className, titulo = 'JJ Pachangas' }) {
     <svg className={className} viewBox="0 0 200 240" {...(titulo ? { role: 'img', 'aria-label': titulo } : { 'aria-hidden': true })}>
       <defs>
         <clipPath id="jj-pelota"><circle cx="100" cy="120" r="40" /></clipPath>
-        <path id="jj-arco" d="M36 176 Q100 228 164 176" />
+        <path id="jj-arco" d="M46 174 Q100 218 154 174" />
       </defs>
       {/* Borde: neón, negro y el campo del escudo */}
       <path d={ESCUDO} fill="#d9ff2e" />
@@ -36,7 +36,7 @@ export default function Logo({ className, titulo = 'JJ Pachangas' }) {
       <Estrella x={128} />
       <text x="100" y="70" textAnchor="middle" fill="#f2f2ee" fontFamily="Anton, Impact, sans-serif" fontSize="26" letterSpacing="2">JJ</text>
 
-      <g transform={escala(1.12)}>
+      <g transform={`translate(0 -4) ${escala(1.0)}`}>
         <g clipPath="url(#jj-pelota)">
           <circle cx="100" cy="120" r="40" fill="#fff" />
           {PANELES.map((p, i) => <polygon key={i} points={p.puntos} fill={p.color} />)}
@@ -46,7 +46,7 @@ export default function Logo({ className, titulo = 'JJ Pachangas' }) {
         <circle cx="100" cy="120" r="40" fill="none" stroke="#0a0b0a" strokeWidth="2.5" />
       </g>
 
-      <text fill="#f2f2ee" fontFamily="Anton, Impact, sans-serif" fontSize="25" letterSpacing="1.5">
+      <text fill="#f2f2ee" fontFamily="Anton, Impact, sans-serif" fontSize="23" letterSpacing="1.2">
         <textPath href="#jj-arco" startOffset="50%" textAnchor="middle">PACHANGAS</textPath>
       </text>
     </svg>
