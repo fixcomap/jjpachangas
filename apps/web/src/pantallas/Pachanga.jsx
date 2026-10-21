@@ -60,10 +60,14 @@ export default function Pachanga({ codigo }) {
 
   const persona = (i, n) => (
     <li key={i.id}>
-      <span className="numero">{n}</span> {i.nombre}
+      <span className="numero">{n}.</span>
+      <span className="nombre">{i.nombre}</span>
       {p.es_organizador && <button className="quitar" onClick={() => sacar(i.id)} aria-label={`Sacar a ${i.nombre}`}>×</button>}
     </li>
   );
+
+  // Pizarra: los `cupo` huecos numerados desde el principio; se llenan por orden de llegada.
+  const huecos = Array.from({ length: p.cupo }, (_, n) => p.titulares[n]);
 
   return (
     <main>
@@ -100,13 +104,20 @@ export default function Pachanga({ codigo }) {
       )}
       {error && <p className="error">{error}</p>}
 
-      <section>
-        <h2>Juegan</h2>
-        {anotados ? <ol className="jugadores">{p.titulares.map((i, n) => persona(i, n + 1))}</ol> : <p>Todavía no se anotó nadie.</p>}
+      <section className="pizarra" aria-label="Lista de jugadores">
+        <h2>{p.deporte} · {anotados}/{p.cupo}</h2>
+        <ol>
+          {huecos.map((i, n) => (i ? persona(i, n + 1) : (
+            <li key={`libre-${n}`} className="libre">
+              <span className="numero">{n + 1}.</span>
+              <span className="nombre">__________</span>
+            </li>
+          )))}
+        </ol>
         {p.suplentes.length > 0 && (
           <>
-            <h2>Suplentes</h2>
-            <ol className="jugadores">{p.suplentes.map((i, n) => persona(i, p.cupo + n + 1))}</ol>
+            <h3>Suplentes</h3>
+            <ol>{p.suplentes.map((i, n) => persona(i, p.cupo + n + 1))}</ol>
           </>
         )}
       </section>
