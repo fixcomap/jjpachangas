@@ -2,7 +2,11 @@
 const formatoDia = new Intl.DateTimeFormat('es', { weekday: 'long', day: 'numeric', month: 'long' });
 const formatoHora = new Intl.DateTimeFormat('es', { hour: '2-digit', minute: '2-digit' });
 
-export const dia = (iso) => formatoDia.format(new Date(iso));
+// "viernes, 23 de octubre" -> "Viernes, 23 de octubre"
+export const dia = (iso) => {
+  const texto = formatoDia.format(new Date(iso));
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+};
 export const hora = (iso) => formatoHora.format(new Date(iso));
 
 // <input type="date"> + <input type="time"> (hora local) -> ISO con zona.
