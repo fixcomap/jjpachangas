@@ -3,20 +3,22 @@ const assert = require('node:assert');
 const { nuevaPachanga, nombreJugador, nuevoCodigo, esCodigo, repartir, ErrorValidacion } = require('../src/validar');
 
 const ahora = new Date('2026-10-21T12:00:00Z');
-const valida = { deporte: ' Fútbol  sala ', cupo: '10', empieza_en: '2026-10-23T19:00:00Z', lugar: 'Polideportivo' };
+const valida = { deporte: 'Fútbol 7', empieza_en: '2026-10-23T19:00:00Z', lugar: 'Polideportivo' };
 
-test('nuevaPachanga limpia y convierte', () => {
-  const p = nuevaPachanga(valida, ahora);
-  assert.strictEqual(p.deporte, 'Fútbol sala');
-  assert.strictEqual(p.cupo, 10);
+test('nuevaPachanga: el cupo sale de la modalidad, no del cliente', () => {
+  const p = nuevaPachanga({ ...valida, cupo: 30 }, ahora);
+  assert.strictEqual(p.deporte, 'Fútbol 7');
+  assert.strictEqual(p.cupo, 14);
+  assert.strictEqual(nuevaPachanga({ ...valida, deporte: 'Pádel dúos' }, ahora).cupo, 4);
+  assert.strictEqual(nuevaPachanga({ ...valida, deporte: 'Fútbol 11' }, ahora).cupo, 22);
   assert.strictEqual(p.empiezaEn.toISOString(), '2026-10-23T19:00:00.000Z');
 });
 
 test('nuevaPachanga rechaza lo inválido', () => {
   for (const malo of [
-    { ...valida, cupo: 1 },
-    { ...valida, cupo: 31 },
-    { ...valida, cupo: 'diez' },
+    { ...valida, deporte: 'Fútbol 8' },
+    { ...valida, deporte: 'fútbol 7' },
+    { ...valida, deporte: undefined },
     { ...valida, empieza_en: '2026-10-20T19:00:00Z' },
     { ...valida, empieza_en: 'mañana' },
     { ...valida, empieza_en: '2028-01-01T00:00:00Z' },
@@ -45,4 +47,11 @@ test('repartir titulares y suplentes por orden de llegada', () => {
   const lista = [1, 2, 3, 4, 5].map((id) => ({ id }));
   assert.deepStrictEqual(repartir(lista, 3), { titulares: lista.slice(0, 3), suplentes: lista.slice(3) });
   assert.deepStrictEqual(repartir(lista.slice(0, 2), 3), { titulares: lista.slice(0, 2), suplentes: [] });
+});
+
+test('las modalidades del front y de la API coinciden', async () => {
+  const MODALIDADES = require('../src/modalidades');
+  const { DEPORTES } = await import('../../web/src/datos/modalidades.js');
+  const delFront = new Map(DEPORTES.flatMap((d) => d.modalidades.map((m) => [m.nombre, m.cupo])));
+  assert.deepStrictEqual(delFront, MODALIDADES);
 });
