@@ -1,0 +1,16 @@
+# Postgres de desarrollo. Las tablas las crea la API (npm run migrar).
+services:
+  db:
+    image: postgres:16
+    container_name: jjpachangas-db
+    environment:
+      POSTGRES_USER: jjpachangas
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: jjpachangas
+    ports:
+      - "5432:5432"
+    volumes:
+      - datos:/var/lib/postgresql/data
+
+volumes:
+  datos:

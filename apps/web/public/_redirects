@@ -1,0 +1,2 @@
+# Cloudflare Pages: cualquier ruta carga la app y React decide qué mostrar.
+/*  /index.html  200
