@@ -1,4 +1,8 @@
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
+
+// bigint (ids) como número y no como texto: sobra margen (2^53) y así se
+// comparan y serializan bien.
+types.setTypeParser(20, (valor) => Number(valor));
 const config = require('./config');
 
 const pool = new Pool(config.db);

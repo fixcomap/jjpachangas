@@ -17,8 +17,8 @@ Front React (Vite) en Cloudflare Pages + API Node (Express) en Cloud Run + Postg
 | Fase | Qué | |
 |---|---|---|
 | 1 | Esqueleto desplegado: API con `/salud`, front, migraciones | ✅ |
-| 2 | Login con Google, crear pachanga, link público, anotarse, compartir por WhatsApp | ⏳ |
-| 3 | Equipos con color de camiseta e imagen para compartir | |
+| 2 | Login con Google, crear pachanga, link público, anotarse, compartir por WhatsApp | ✅ |
+| 3 | Equipos con color de camiseta e imagen para compartir | ⏳ |
 | 4 | Aviso al organizador al llenarse el cupo (push y email) | |
 
 ## Estructura
@@ -37,11 +37,25 @@ Requisitos: Node 22+ y Docker.
 ```sh
 cp .env.example .env                                   # y poner una POSTGRES_PASSWORD
 docker compose up -d                                   # Postgres en localhost:5432
-(cd apps/api && npm ci && npm run migrar && npm run dev)   # API en :3000
+(cd apps/api && npm ci && npm run migrar && DEV_USER=tu@email npm run dev)   # API en :3000
 (cd apps/web && npm ci && npm run dev)                     # front en http://localhost:5173
 ```
 
 Vite reenvía `/api/*` a la API sin el prefijo. En Pages, el front llama a `VITE_API_URL`.
+`DEV_USER` entra sin Google (solo fuera de producción). Para probar el login real en local:
+`GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` en `.env` (el cliente ya tiene la redirect URI de localhost).
+Tests: `(cd apps/api && npm test)`.
+
+## API
+
+| Ruta | Quién | Qué |
+|---|---|---|
+| `GET /auth/login`, `/auth/callback` | — | login con Google (código OAuth en el servidor) |
+| `GET /auth/yo`, `POST /auth/salir` | organizador | sesión actual / cerrarla |
+| `GET /pachangas`, `POST /pachangas` | organizador | sus pachangas / crear una (devuelve el `codigo` del link) |
+| `DELETE /pachangas/:codigo/inscripciones/:id` | organizador | sacar a alguien de la lista |
+| `GET /p/:codigo` | cualquiera con el link | detalle, titulares y suplentes |
+| `POST /p/:codigo/inscripciones` | cualquiera con el link | anotarse con un nombre (20 por IP cada 15 min) |
 
 ## Cómo se despliega
 
