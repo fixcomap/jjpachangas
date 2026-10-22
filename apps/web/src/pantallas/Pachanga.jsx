@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { pedir } from '../api.js';
 import { dia, hora } from '../fechas.js';
 import { iconoDe } from '../datos/modalidades.js';
+import Equipos from '../componentes/Equipos.jsx';
 
 // Página del link público. Cualquiera ve la lista y se anota; el organizador,
 // además, la comparte por WhatsApp y puede sacar a alguien.
@@ -158,6 +159,8 @@ export default function Pachanga({ codigo }) {
         </form>
       )}
       {error && <p className="error">{error}</p>}
+
+      <Equipos p={p} setP={setP} mensaje={mensaje} />
 
       <section className="tiza" aria-label="Lista de jugadores">
         <div className="tiza-titulo">

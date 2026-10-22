@@ -6,7 +6,7 @@ const pool = require('./db');
 const { requiereSesion } = require('./auth');
 const {
   ErrorValidacion, nuevaPachanga, nombreJugador, nuevoCodigo, esCodigo, repartir,
-  PLAZO_BAJA_HORAS, bajaHasta, puedeBajarse, nuevoTokenBaja, hashToken,
+  PLAZO_BAJA_HORAS, bajaHasta, puedeBajarse, nuevoTokenBaja, hashToken, equipos,
 } = require('./validar');
 
 // Anotarse es público: límite por IP para que un script no llene la lista.
@@ -14,14 +14,15 @@ const limitadorInscripcion = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, st
 
 async function estado(codigo, usuario) {
   const { rows } = await pool.query(
-    `SELECT p.id, p.codigo, p.deporte, p.cupo, p.empieza_en, p.lugar, p.organizador_id, u.nombre AS organizador
+    `SELECT p.id, p.codigo, p.deporte, p.cupo, p.empieza_en, p.lugar, p.organizador_id, p.color_1, p.color_2,
+            u.nombre AS organizador
      FROM pachangas p JOIN usuarios u ON u.id = p.organizador_id WHERE p.codigo = $1`,
     [codigo]
   );
   const p = rows[0];
   if (!p) return null;
   const { rows: inscripciones } = await pool.query(
-    'SELECT id, nombre FROM inscripciones WHERE pachanga_id = $1 ORDER BY creada_en, id',
+    'SELECT id, nombre, equipo FROM inscripciones WHERE pachanga_id = $1 ORDER BY creada_en, id',
     [p.id]
   );
   return {
@@ -33,6 +34,7 @@ async function estado(codigo, usuario) {
     organizador: p.organizador,
     es_organizador: usuario?.id === p.organizador_id,
     baja_hasta: bajaHasta(p.empieza_en),
+    colores: p.color_1 ? [p.color_1, p.color_2] : null,
     ...repartir(inscripciones, p.cupo),
   };
 }
@@ -89,6 +91,33 @@ router.post('/pachangas/:codigo/inscripciones', requiereSesion, manejar(async (r
     throw err;
   }
   res.status(201).json(await estado(req.params.codigo, req.usuario));
+}));
+
+// Guardar los equipos: colores de camiseta y reparto de los titulares. Solo el organizador.
+router.put('/pachangas/:codigo/equipos', requiereSesion, manejar(async (req, res) => {
+  if (!esCodigo(req.params.codigo)) return res.status(404).json({ error: 'No existe' });
+  const e = await estado(req.params.codigo, req.usuario);
+  if (!e || !e.es_organizador) return res.status(404).json({ error: 'No existe' });
+  const { colores, asignaciones } = equipos(req.body, e.titulares.map((i) => i.id));
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('UPDATE pachangas SET color_1 = $2, color_2 = $3 WHERE codigo = $1', [req.params.codigo, ...colores]);
+    await client.query(
+      'UPDATE inscripciones SET equipo = NULL WHERE pachanga_id = (SELECT id FROM pachangas WHERE codigo = $1)',
+      [req.params.codigo]
+    );
+    for (const [id, equipo] of asignaciones) {
+      await client.query('UPDATE inscripciones SET equipo = $2 WHERE id = $1', [id, equipo]);
+    }
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+  res.json(await estado(req.params.codigo, req.usuario));
 }));
 
 // Sacar a alguien de la lista (se equivocó de nombre, no viene...): solo el organizador.

@@ -18,8 +18,8 @@ Front React (Vite) en Cloudflare Pages + API Node (Express) en Cloud Run + Postg
 |---|---|---|
 | 1 | Esqueleto desplegado: API con `/salud`, front, migraciones | ✅ |
 | 2 | Login con Google, crear pachanga, link público, anotarse, compartir por WhatsApp | ✅ |
-| 3 | Equipos con color de camiseta e imagen para compartir | ⏳ |
-| 4 | Aviso al organizador al llenarse el cupo (push y email) | |
+| 3 | Equipos con color de camiseta e imagen para compartir | ✅ |
+| 4 | Aviso al organizador al llenarse el cupo (push y email) | ⏳ |
 
 ## Estructura
 
@@ -53,9 +53,14 @@ Tests: `(cd apps/api && npm test)`.
 | `GET /auth/login`, `/auth/callback` | — | login con Google (código OAuth en el servidor) |
 | `GET /auth/yo`, `POST /auth/salir` | organizador | sesión actual / cerrarla |
 | `GET /pachangas`, `POST /pachangas` | organizador | sus pachangas / crear una (devuelve el `codigo` del link) |
+| `POST /pachangas/:codigo/inscripciones` | organizador | agregar a alguien a mano |
+| `PUT /pachangas/:codigo/equipos` | organizador | colores de camiseta y reparto de los titulares |
 | `DELETE /pachangas/:codigo/inscripciones/:id` | organizador | sacar a alguien de la lista |
 | `GET /p/:codigo` | cualquiera con el link | detalle, titulares y suplentes |
-| `POST /p/:codigo/inscripciones` | cualquiera con el link | anotarse con un nombre (20 por IP cada 15 min) |
+| `POST /p/:codigo/inscripciones` | cualquiera con el link | anotarse con un nombre (20 por IP cada 15 min); devuelve el código de baja |
+| `DELETE /p/:codigo/inscripciones/:id` | quien se anotó (`X-Baja-Token`) | bajarse, hasta 3 h antes del partido |
+
+La imagen para compartir la genera el navegador del organizador (`apps/web/src/imagen.js`, canvas 1080×1350).
 
 ## Cómo se despliega
 
