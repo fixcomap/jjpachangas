@@ -73,3 +73,21 @@ test('token de baja: al azar y solo se guarda su hash', () => {
   assert.strictEqual(hashToken(t), hashToken(t));
   assert.notStrictEqual(hashToken(t), t);
 });
+
+test('equipos: colores válidos y distintos, solo titulares, equipo 1 o 2', () => {
+  const { equipos, ErrorValidacion: E } = require('../src/validar');
+  const ok = equipos({ colores: ['negro', 'blanco'], equipos: { 1: 1, 2: 2, 3: 1 } }, [1, 2, 3, 4]);
+  assert.deepStrictEqual(ok.colores, ['negro', 'blanco']);
+  assert.deepStrictEqual([...ok.asignaciones], [[1, 1], [2, 2], [3, 1]]);
+  assert.throws(() => equipos({ colores: ['negro', 'negro'], equipos: {} }, [1]), E);
+  assert.throws(() => equipos({ colores: ['negro', 'verde'], equipos: {} }, [1]), E);
+  assert.throws(() => equipos({ colores: ['negro'], equipos: {} }, [1]), E);
+  assert.throws(() => equipos({ colores: ['negro', 'rojo'], equipos: { 9: 1 } }, [1]), E);
+  assert.throws(() => equipos({ colores: ['negro', 'rojo'], equipos: { 1: 3 } }, [1]), E);
+});
+
+test('los colores del front y de la API coinciden', async () => {
+  const COLORES = require('../src/colores');
+  const { COLORES: delFront } = await import('../../web/src/datos/colores.js');
+  assert.deepStrictEqual(delFront.map((c) => c.id), COLORES);
+});

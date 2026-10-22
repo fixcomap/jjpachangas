@@ -217,3 +217,18 @@ input:focus { outline: 2px solid var(--neon); outline-offset: 1px; }
 .lista strong { font-family: var(--titulo); font-weight: 400; text-transform: uppercase; letter-spacing: 0.5px; font-size: 1.1rem; }
 .lista .contador { font-family: var(--titulo); color: var(--neon); font-size: 1.2rem; white-space: nowrap; }
 .hola { color: var(--tenue); margin: 6px 0 0; }
+
+/* ---------- equipos ---------- */
+.muestra { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.4); vertical-align: -2px; }
+.colores button { min-width: 0; flex: 1 1 70px; padding: 10px 6px; font-size: 0.9rem; white-space: nowrap; }
+.reparto-cabecera { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+.reparto-cabecera legend { font-size: 0.85rem; color: var(--tenue); text-transform: uppercase; letter-spacing: 0.5px; }
+.reparto { list-style: none; padding: 0; margin: 8px 0 0; }
+.reparto li { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--borde); }
+.reparto li span { flex: 1; font-family: var(--tiza); font-size: 1.2rem; }
+.reparto button { min-width: 74px; padding: 7px 10px; border: 1px solid var(--borde); border-radius: 10px; background: #0e100f; color: var(--tenue); cursor: pointer; }
+.reparto button.activa { border-color: var(--neon); font-weight: 600; }
+.equipos .columnas { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.equipos .columna h3 { font-family: var(--titulo); font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 6px; color: var(--neon); }
+.equipos .columna ul { list-style: none; padding: 0; margin: 0; font-family: var(--tiza); font-size: 1.25rem; }
+.equipos .columna li { padding: 3px 0; }

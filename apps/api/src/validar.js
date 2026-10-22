@@ -2,6 +2,7 @@
 // puras (sin base) para poder probarlas con node --test.
 const crypto = require('crypto');
 const MODALIDADES = require('./modalidades');
+const COLORES = require('./colores');
 
 class ErrorValidacion extends Error {}
 
@@ -46,6 +47,22 @@ const puedeBajarse = (empiezaEn, ahora = new Date()) => ahora < bajaHasta(empiez
 const nuevoTokenBaja = () => crypto.randomBytes(24).toString('hex');
 const hashToken = (token) => crypto.createHash('sha256').update(String(token)).digest('hex');
 
+// Equipos: { colores: [c1, c2], equipos: { <id inscripción>: 1 | 2 } }. Solo
+// titulares; colores de la lista y distintos entre sí.
+function equipos(body, idsTitulares) {
+  const [c1, c2] = Array.isArray(body?.colores) ? body.colores : [];
+  if (!COLORES.includes(c1) || !COLORES.includes(c2)) throw new ErrorValidacion(`colores: elegí entre ${COLORES.join(', ')}`);
+  if (c1 === c2) throw new ErrorValidacion('colores: cada equipo con un color distinto');
+  const titulares = new Set(idsTitulares);
+  const asignaciones = new Map();
+  for (const [id, equipo] of Object.entries(body?.equipos ?? {})) {
+    if (!titulares.has(Number(id))) throw new ErrorValidacion('equipos: solo se reparten los que juegan');
+    if (equipo !== 1 && equipo !== 2) throw new ErrorValidacion('equipos: cada jugador va al equipo 1 o al 2');
+    asignaciones.set(Number(id), equipo);
+  }
+  return { colores: [c1, c2], asignaciones };
+}
+
 // Por orden de llegada: los primeros `cupo` juegan, el resto son suplentes.
 function repartir(inscripciones, cupo) {
   return { titulares: inscripciones.slice(0, cupo), suplentes: inscripciones.slice(cupo) };
@@ -53,5 +70,5 @@ function repartir(inscripciones, cupo) {
 
 module.exports = {
   ErrorValidacion, nuevaPachanga, nombreJugador, nuevoCodigo, esCodigo, repartir,
-  PLAZO_BAJA_HORAS, bajaHasta, puedeBajarse, nuevoTokenBaja, hashToken,
+  PLAZO_BAJA_HORAS, bajaHasta, puedeBajarse, nuevoTokenBaja, hashToken, equipos,
 };
