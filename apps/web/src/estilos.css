@@ -202,6 +202,9 @@ input:focus { outline: 2px solid var(--neon); outline-offset: 1px; }
 .hero { text-align: center; padding: 3vh 0 12px; }
 .hero > p:not(.cartel-pre) { color: var(--tenue); margin: 18px 0 26px; font-size: 1.05rem; }
 .lista { list-style: none; padding: 0; margin: 0; }
+.lista li { display: flex; align-items: center; gap: 6px; }
+.lista li a { flex: 1; }
+.boton.eliminar { margin-top: 18px; }
 .lista li a {
   display: flex;
   justify-content: space-between;
