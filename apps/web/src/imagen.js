@@ -113,7 +113,7 @@ export async function generarImagen(p) {
   ctx.textAlign = 'center';
   ctx.fillStyle = '#ffffff';
   ctx.font = 'italic 70px Anton';
-  textoInclinado(ctx, 'PARTIDITO EN', W / 2, 250);
+  textoInclinado(ctx, p.tipo === 'desafio' ? 'DESAFÍO EN' : 'PARTIDITO EN', W / 2, 250);
   // El lugar se dibuja y se gasta en un lienzo aparte: los agujeros no tienen que
   // borrar el fondo del cartel.
   const lugar = p.lugar.toUpperCase();
@@ -144,7 +144,10 @@ export async function generarImagen(p) {
     camiseta(ctx, cx - 55, arriba, 110, c.hex);
     ctx.fillStyle = NEON;
     ctx.font = 'italic 50px Anton';
-    textoInclinado(ctx, `EQUIPO ${c.nombre.toUpperCase()}`, cx, arriba + 175);
+    const etiqueta = (p.nombres ? p.nombres[n - 1] : `Equipo ${c.nombre}`).toUpperCase();
+    ajustar(ctx, etiqueta, 'Anton', 50, W / 2 - 70);
+    ctx.font = `italic ${ctx.font}`;
+    textoInclinado(ctx, etiqueta, cx, arriba + 175);
     const jugadores = p.titulares.filter((i) => i.equipo === n);
     const alto = Math.min(60, Math.floor((H - (arriba + 240) - 110) / Math.max(jugadores.length, 1)));
     ctx.fillStyle = TIZA;
