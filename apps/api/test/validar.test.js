@@ -91,3 +91,27 @@ test('los colores del front y de la API coinciden', async () => {
   const { COLORES: delFront } = await import('../../web/src/datos/colores.js');
   assert.deepStrictEqual(delFront.map((c) => c.id), COLORES);
 });
+
+test('desafío: nombres y colores de los dos grupos', () => {
+  const { nuevaPachanga, ErrorValidacion: E } = require('../src/validar');
+  const base = { deporte: 'Fútbol 6', empieza_en: '2026-10-23T19:00:00Z', lugar: 'Pabellón', tipo: 'desafio' };
+  const d = nuevaPachanga({ ...base, nombres: [' Los de Agus ', 'Los de Juan'], colores: ['negro', 'blanco'] }, ahora);
+  assert.strictEqual(d.tipo, 'desafio');
+  assert.strictEqual(d.cupo, 12);
+  assert.deepStrictEqual(d.grupos, { nombres: ['Los de Agus', 'Los de Juan'], colores: ['negro', 'blanco'] });
+  assert.throws(() => nuevaPachanga({ ...base, nombres: ['A', 'Los de Juan'], colores: ['negro', 'blanco'] }, ahora), E);
+  assert.throws(() => nuevaPachanga({ ...base, nombres: ['Los de Agus', 'Los de Juan'], colores: ['negro', 'negro'] }, ahora), E);
+  assert.strictEqual(nuevaPachanga({ ...valida }, ahora).tipo, 'abierta');
+  assert.strictEqual(nuevaPachanga({ ...valida }, ahora).grupos, null);
+});
+
+test('desafío: grupo al anotarse y cambios de grupo', () => {
+  const { grupoDeInscripcion, cambiosGrupo, ErrorValidacion: E } = require('../src/validar');
+  assert.strictEqual(grupoDeInscripcion('abierta', 2), null);
+  assert.strictEqual(grupoDeInscripcion('desafio', '2'), 2);
+  assert.throws(() => grupoDeInscripcion('desafio', 3), E);
+  assert.throws(() => grupoDeInscripcion('desafio', undefined), E);
+  assert.deepStrictEqual(cambiosGrupo({ nombre: ' Los Pibes ', color: 'rojo' }, 2, 'negro'), { nombre: 'Los Pibes', color: 'rojo' });
+  assert.throws(() => cambiosGrupo({ color: 'negro' }, 2, 'negro'), E);
+  assert.throws(() => cambiosGrupo({}, 2, 'negro'), E);
+});

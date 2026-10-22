@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { pedir, URL_API } from '../api.js';
 import { aIso, dia, hora } from '../fechas.js';
 import { DEPORTES } from '../datos/modalidades.js';
+import { COLORES } from '../datos/colores.js';
 
 
 export default function Inicio() {
@@ -39,7 +40,7 @@ export default function Inicio() {
       <p className="hola">
         Hola, {usuario.nombre} · <button className="enlace" onClick={salir}>Salir</button>
       </p>
-      <NuevaPachanga />
+      <NuevaPachanga miNombre={usuario.nombre.split(' ')[0]} />
       <Lista titulo="Tus partiditos" pachangas={pachangas.filter((p) => new Date(p.empieza_en) > new Date())} setPachangas={setPachangas} />
       <Lista titulo="Ya jugados" nota="Se borran solos un día después del partido." pachangas={pachangas.filter((p) => new Date(p.empieza_en) <= new Date())} setPachangas={setPachangas} />
     </main>
@@ -76,7 +77,9 @@ function Lista({ titulo, nota, pachangas, setPachangas }) {
   );
 }
 
-function NuevaPachanga() {
+function NuevaPachanga({ miNombre }) {
+  const [tipo, setTipo] = useState('abierta');
+  const [colores, setColores] = useState(['negro', 'blanco']);
   const [error, setError] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [deporteId, setDeporteId] = useState(DEPORTES[0].id);
@@ -101,6 +104,8 @@ function NuevaPachanga() {
         // El cupo lo fija la API según la modalidad.
         body: JSON.stringify({
           deporte: elegida.nombre,
+          tipo,
+          ...(tipo === 'desafio' ? { nombres: [f.get('nombre1'), f.get('nombre2')], colores } : {}),
           empieza_en: aIso(f.get('fecha'), f.get('hora')),
           lugar: f.get('lugar'),
         }),
@@ -116,6 +121,15 @@ function NuevaPachanga() {
     <form className="tarjeta" onSubmit={crear}>
       <h2>Nuevo partidito</h2>
       <fieldset className="opciones">
+        <legend>Tipo</legend>
+        <button type="button" className={tipo === 'abierta' ? 'activa' : ''} aria-pressed={tipo === 'abierta'} onClick={() => setTipo('abierta')}>
+          Lista abierta<small>se anotan y armás los equipos</small>
+        </button>
+        <button type="button" className={tipo === 'desafio' ? 'activa' : ''} aria-pressed={tipo === 'desafio'} onClick={() => setTipo('desafio')}>
+          Desafío<small>tu equipo contra otro</small>
+        </button>
+      </fieldset>
+      <fieldset className="opciones">
         <legend>Deporte</legend>
         {DEPORTES.map((d) => (
           <button type="button" key={d.id} className={d.id === deporteId ? 'activa' : ''} aria-pressed={d.id === deporteId} onClick={() => elegirDeporte(d.id)}>
@@ -128,10 +142,27 @@ function NuevaPachanga() {
         {deporte.modalidades.map((m) => (
           <button type="button" key={m.nombre} className={m.nombre === elegida.nombre ? 'activa' : ''} aria-pressed={m.nombre === elegida.nombre} onClick={() => setModalidad(m.nombre)}>
             {m.corto}
-            <small>{m.cupo} jugadores</small>
+            <small>{tipo === 'desafio' ? `${m.cupo / 2} contra ${m.cupo / 2}` : `${m.cupo} jugadores`}</small>
           </button>
         ))}
       </fieldset>
+      {tipo === 'desafio' && [1, 2].map((n) => (
+        <div key={n}>
+          <label>
+            {n === 1 ? 'Tu equipo' : 'El equipo rival'}
+            <input name={`nombre${n}`} required minLength={2} maxLength={30} defaultValue={n === 1 ? `Los de ${miNombre}` : ''} placeholder={n === 2 ? 'Los de Juan' : ''} />
+          </label>
+          <fieldset className="opciones colores">
+            <legend>Camiseta</legend>
+            {COLORES.map((c) => (
+              <button type="button" key={c.id} disabled={colores[2 - n] === c.id} className={colores[n - 1] === c.id ? 'activa' : ''} aria-pressed={colores[n - 1] === c.id}
+                onClick={() => setColores(n === 1 ? [c.id, colores[1]] : [colores[0], c.id])}>
+                <span className="muestra" style={{ background: c.hex }} /> {c.nombre}
+              </button>
+            ))}
+          </fieldset>
+        </div>
+      ))}
       <div className="fila">
         <label>Día<input name="fecha" type="date" required /></label>
         <label>Hora<input name="hora" type="time" required /></label>

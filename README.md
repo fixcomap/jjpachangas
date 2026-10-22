@@ -54,7 +54,11 @@ Tests: `(cd apps/api && npm test)`.
 | `GET /auth/yo`, `POST /auth/salir` | organizador | sesión actual / cerrarla |
 | `GET /pachangas`, `POST /pachangas` | organizador | sus pachangas / crear una (devuelve el `codigo` del link) |
 | `POST /pachangas/:codigo/inscripciones` | organizador | agregar a alguien a mano |
-| `PUT /pachangas/:codigo/equipos` | organizador | colores de camiseta y reparto de los titulares |
+| `PUT /pachangas/:codigo/equipos` | organizador | lista abierta: colores de camiseta y reparto de los titulares |
+| `DELETE /pachangas/:codigo` | organizador | eliminar la pachanga (además se borran solas 1 día después del partido) |
+| `POST /pachangas/:codigo/capitan` | organizador | desafío: nuevo link de capitán del equipo 2 (anula el anterior) |
+| `PATCH /p/:codigo/grupos/:n` | organizador o capitán del 2 (`X-Capitan-Token`) | desafío: nombre y color de un equipo |
+| `DELETE /p/:codigo/grupos/:n/inscripciones/:id` | organizador o capitán del 2 | desafío: sacar a alguien de un equipo |
 | `DELETE /pachangas/:codigo/inscripciones/:id` | organizador | sacar a alguien de la lista |
 | `GET /p/:codigo` | cualquiera con el link | detalle, titulares y suplentes |
 | `POST /p/:codigo/inscripciones` | cualquiera con el link | anotarse con un nombre (20 por IP cada 15 min); devuelve el código de baja |

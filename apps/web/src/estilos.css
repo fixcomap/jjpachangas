@@ -235,3 +235,13 @@ input:focus { outline: 2px solid var(--neon); outline-offset: 1px; }
 .equipos .columna h3 { font-family: var(--titulo); font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 6px; color: var(--neon); }
 .equipos .columna ul { list-style: none; padding: 0; margin: 0; font-family: var(--tiza); font-size: 1.25rem; }
 .equipos .columna li { padding: 3px 0; }
+
+/* ---------- desafío ---------- */
+.versus { margin: 14px 0 0; font-family: var(--titulo); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.versus span { color: var(--neon); margin: 0 8px; font-style: italic; }
+.muestra.grande { width: 18px; height: 18px; vertical-align: -1px; }
+.grupos .tiza { margin-top: 22px; }
+.panel-desafio .grupo-panel { padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--borde); }
+.panel-desafio .capitan h3 { font-family: var(--titulo); font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px; }
+.panel-desafio small { display: block; margin-top: 6px; }
+.opciones button:disabled { opacity: 0.3; cursor: not-allowed; }
