@@ -40,26 +40,39 @@ export default function Inicio() {
         Hola, {usuario.nombre} · <button className="enlace" onClick={salir}>Salir</button>
       </p>
       <NuevaPachanga />
-      {pachangas.length > 0 && (
-        <section>
-          <h2>Tus partiditos</h2>
-          <ul className="lista">
-            {pachangas.map((p) => (
-              <li key={p.codigo}>
-                <a href={`/p/${p.codigo}`}>
-                  <span>
-                    <strong>{p.lugar}</strong>
-                    <br />
-                    <span className="tenue">{p.deporte} · {dia(p.empieza_en)}, {hora(p.empieza_en)}</span>
-                  </span>
-                  <span className="contador">{Math.min(p.anotados, p.cupo)}/{p.cupo}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <Lista titulo="Tus partiditos" pachangas={pachangas.filter((p) => new Date(p.empieza_en) > new Date())} setPachangas={setPachangas} />
+      <Lista titulo="Ya jugados" nota="Se borran solos un día después del partido." pachangas={pachangas.filter((p) => new Date(p.empieza_en) <= new Date())} setPachangas={setPachangas} />
     </main>
+  );
+}
+
+function Lista({ titulo, nota, pachangas, setPachangas }) {
+  if (!pachangas.length) return null;
+  async function eliminar(p) {
+    if (!window.confirm(`¿Eliminar el partidito en ${p.lugar}? Se borra la lista entera.`)) return;
+    await pedir(`/pachangas/${p.codigo}`, { method: 'DELETE' });
+    setPachangas((todas) => todas.filter((x) => x.codigo !== p.codigo));
+  }
+  return (
+    <section>
+      <h2>{titulo}</h2>
+      {nota && <p className="tenue">{nota}</p>}
+      <ul className="lista">
+        {pachangas.map((p) => (
+          <li key={p.codigo}>
+            <a href={`/p/${p.codigo}`}>
+              <span>
+                <strong>{p.lugar}</strong>
+                <br />
+                <span className="tenue">{p.deporte} · {dia(p.empieza_en)}, {hora(p.empieza_en)}</span>
+              </span>
+              <span className="contador">{Math.min(p.anotados, p.cupo)}/{p.cupo}</span>
+            </a>
+            <button className="quitar" onClick={() => eliminar(p)} aria-label={`Eliminar el partidito en ${p.lugar}`}>🗑</button>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

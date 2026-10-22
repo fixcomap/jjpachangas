@@ -162,6 +162,14 @@ export default function Pachanga({ codigo }) {
 
       <Equipos p={p} setP={setP} mensaje={mensaje} />
 
+      {p.es_organizador && (
+        <button className="boton baja eliminar" onClick={async () => {
+          if (!window.confirm('¿Eliminar este partidito? Se borra la lista entera.')) return;
+          await pedir(`/pachangas/${codigo}`, { method: 'DELETE' });
+          window.location.assign('/');
+        }}>Eliminar partidito</button>
+      )}
+
       <section className="tiza" aria-label="Lista de jugadores">
         <div className="tiza-titulo">
           <h2>{anotados >= p.cupo ? '¡Completo!' : 'Juegan'}</h2>

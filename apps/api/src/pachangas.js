@@ -12,6 +12,22 @@ const {
 // Anotarse es público: límite por IP para que un script no llene la lista.
 const limitadorInscripcion = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: true, legacyHeaders: false });
 
+// Las pachangas se borran solas 1 día después de jugarse (con sus inscripciones).
+// Sin cron: lo hace la propia API al listar o abrir una, como mucho cada 10 min
+// por instancia. Barato (índice por fecha) y sin servicios extra.
+const MARGEN_BORRADO = '1 day';
+let ultimaLimpieza = 0;
+async function limpiarViejas() {
+  if (Date.now() - ultimaLimpieza < 10 * 60 * 1000) return;
+  ultimaLimpieza = Date.now();
+  try {
+    const { rowCount } = await pool.query(`DELETE FROM pachangas WHERE empieza_en < now() - interval '${MARGEN_BORRADO}'`);
+    if (rowCount) console.log(`limpieza: ${rowCount} pachanga(s) vieja(s) borrada(s)`);
+  } catch (err) {
+    console.error(`limpieza: ${err.message}`);
+  }
+}
+
 async function estado(codigo, usuario) {
   const { rows } = await pool.query(
     `SELECT p.id, p.codigo, p.deporte, p.cupo, p.empieza_en, p.lugar, p.organizador_id, p.color_1, p.color_2,
@@ -55,6 +71,7 @@ const router = express.Router();
 // ---------- organizador ----------
 
 router.get('/pachangas', requiereSesion, manejar(async (req, res) => {
+  await limpiarViejas();
   const { rows } = await pool.query(
     `SELECT p.codigo, p.deporte, p.cupo, p.empieza_en, p.lugar, count(i.id)::int AS anotados
      FROM pachangas p LEFT JOIN inscripciones i ON i.pachanga_id = p.id
@@ -72,6 +89,14 @@ router.post('/pachangas', requiereSesion, manejar(async (req, res) => {
     [nuevoCodigo(), req.usuario.id, p.deporte, p.cupo, p.empiezaEn, p.lugar]
   );
   res.status(201).json(rows[0]);
+}));
+
+// Eliminar la pachanga entera (con sus inscripciones): solo el organizador.
+router.delete('/pachangas/:codigo', requiereSesion, manejar(async (req, res) => {
+  if (!esCodigo(req.params.codigo)) return res.status(404).json({ error: 'No existe' });
+  const { rowCount } = await pool.query('DELETE FROM pachangas WHERE codigo = $1 AND organizador_id = $2', [req.params.codigo, req.usuario.id]);
+  if (!rowCount) return res.status(404).json({ error: 'No existe' });
+  res.json({ ok: true });
 }));
 
 // Agregar a alguien a mano (avisó por WhatsApp, en persona...): solo el organizador.
@@ -136,6 +161,7 @@ router.delete('/pachangas/:codigo/inscripciones/:id', requiereSesion, manejar(as
 // ---------- público (link de WhatsApp) ----------
 
 router.get('/p/:codigo', manejar(async (req, res) => {
+  await limpiarViejas();
   const e = esCodigo(req.params.codigo) ? await estado(req.params.codigo, req.usuario) : null;
   if (!e) return res.status(404).json({ error: 'Esta pachanga no existe' });
   res.json(e);
