@@ -17,6 +17,9 @@ function opcionesCookie(maxAge) {
   return { httpOnly: true, secure: config.esProduccion, sameSite: 'lax', path: '/', maxAge };
 }
 
+// Entorno restringido: solo los emails de ACCESO_EMAILS (sesiones viejas incluidas).
+const puedeEntrar = (email) => !config.accesoEmails.length || config.accesoEmails.includes(String(email).toLowerCase());
+
 const hash = (token) => crypto.createHash('sha256').update(token).digest('hex');
 
 async function abrirSesion(res, usuarioId) {
@@ -49,7 +52,7 @@ async function leerSesion(req, res, next) {
          WHERE s.token_hash = $1 AND s.vence_en > now()`,
         [hash(token)]
       );
-      req.usuario = rows[0] || null;
+      req.usuario = rows[0] && puedeEntrar(rows[0].email) ? rows[0] : null;
     } catch (err) {
       return next(err);
     }
@@ -122,6 +125,10 @@ router.get('/callback', async (req, res, next) => {
     });
     const perfil = respPerfil.ok ? await respPerfil.json() : null;
     if (!perfil?.sub || !perfil.email || perfil.email_verified !== true) return volverConError();
+    if (!puedeEntrar(perfil.email)) {
+      console.warn('login: email fuera de ACCESO_EMAILS');
+      return res.redirect(`${config.frontUrl}/?error=acceso`);
+    }
 
     const id = await guardarUsuario({ sub: perfil.sub, email: perfil.email, nombre: perfil.name || perfil.email.split('@')[0] });
     await abrirSesion(res, id);

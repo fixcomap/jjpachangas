@@ -21,13 +21,14 @@ export default function Inicio() {
   if (usuario === undefined) return <p className="centro">Cargando…</p>;
 
   if (!usuario) {
-    const errorLogin = new URLSearchParams(window.location.search).get('error') === 'login';
+    const error = new URLSearchParams(window.location.search).get('error');
     return (
       <main className="hero">
         <p className="cartel-pre">Armá el</p>
         <h1 className="cartel-grande">Partidito</h1>
         <p>Creás la pachanga, mandás el link por WhatsApp y cada uno se anota con su nombre.</p>
-        {errorLogin && <p className="error">No se pudo entrar con Google. Probá de nuevo.</p>}
+        {error === 'login' && <p className="error">No se pudo entrar con Google. Probá de nuevo.</p>}
+        {error === 'acceso' && <p className="error">Este entorno es privado: tu cuenta no tiene acceso.</p>}
         <a className="boton" href={`${URL_API}/auth/login`}>Entrar con Google</a>
       </main>
     );

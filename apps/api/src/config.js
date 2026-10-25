@@ -64,6 +64,9 @@ function cargar() {
     googleClientId: leer('GOOGLE_CLIENT_ID'),
     googleClientSecret: leer('GOOGLE_CLIENT_SECRET'),
     devUser: ES_PRODUCCION ? '' : leer('DEV_USER'),
+    // Desarrollo restringido (catalog: webapp.development.restricted): solo estos
+    // emails pueden entrar. Vacío o placeholder (sin "@") = sin restricción.
+    accesoEmails: (process.env.ACCESO_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter((e) => e.includes('@')),
   };
 }
 
