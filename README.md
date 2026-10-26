@@ -42,8 +42,7 @@ docker compose up -d                                   # Postgres en localhost:5
 ```
 
 Vite reenvía `/api/*` a la API sin el prefijo. En Pages, el front llama a `VITE_API_URL`.
-`DEV_USER` entra sin Google (solo fuera de producción). Para probar el login real en local:
-`GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` en `.env` (el cliente ya tiene la redirect URI de localhost).
+`DEV_USER` entra sin Google (solo fuera de producción). El login con Google se prueba en desarrollo.
 Tests: `(cd apps/api && npm test)`.
 
 ## API
