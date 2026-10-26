@@ -8,7 +8,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const ES_PRODUCCION = process.env.NODE_ENV === 'production';
-const OBLIGATORIAS_EN_PRODUCCION = ['DATABASE_URL', 'FRONT_URL', 'API_URL', 'SESSION_SECRET'];
+const OBLIGATORIAS_EN_PRODUCCION = ['DATABASE_URL', 'FRONT_URL', 'API_URL', 'SESSION_SECRET', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'];
 
 class ErrorConfig extends Error {}
 
@@ -60,6 +60,13 @@ function cargar() {
     frontUrl: origen('FRONT_URL', 'http://localhost:5173'),
     apiUrl: origen('API_URL', 'http://localhost:3000'),
     sessionSecret: leer('SESSION_SECRET') || 'solo-para-desarrollo-local-no-usar-en-produccion',
+    // Login con Google. En local, sin cliente OAuth, DEV_USER entra sin Google.
+    googleClientId: leer('GOOGLE_CLIENT_ID'),
+    googleClientSecret: leer('GOOGLE_CLIENT_SECRET'),
+    devUser: ES_PRODUCCION ? '' : leer('DEV_USER'),
+    // Desarrollo restringido (catalog: webapp.development.restricted): solo estos
+    // emails pueden entrar. Vacío o placeholder (sin "@") = sin restricción.
+    accesoEmails: (process.env.ACCESO_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter((e) => e.includes('@')),
   };
 }
 

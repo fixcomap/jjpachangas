@@ -1,21 +1,24 @@
-import { useEffect, useState } from 'react';
-import { pedir } from './api.js';
+import Inicio from './pantallas/Inicio.jsx';
+import Pachanga from './pantallas/Pachanga.jsx';
+import Logo from './componentes/Logo.jsx';
 
-// Fase 1: pantalla mínima que confirma que front, API y base están conectados.
+// Dos pantallas: el link público /p/<codigo> (lo que se comparte por WhatsApp) y
+// el inicio del organizador. _redirects de Pages manda cualquier ruta a index.html.
 export default function App() {
-  const [estado, setEstado] = useState('comprobando…');
-
-  useEffect(() => {
-    pedir('/salud')
-      .then((r) => setEstado(r.ok ? 'API y base de datos funcionando' : 'la API no ve la base'))
-      .catch(() => setEstado('no se pudo conectar con la API'));
-  }, []);
-
+  const ruta = window.location.pathname.match(/^\/p\/([A-Za-z0-9_-]{11})\/?$/);
   return (
-    <main style={{ fontFamily: 'system-ui, sans-serif', maxWidth: 480, margin: '15vh auto', padding: 16, textAlign: 'center' }}>
-      <h1>Juancito Pachangas</h1>
-      <p>Armá el partido, compartí el link y que se anoten.</p>
-      <p><small>{estado}</small></p>
-    </main>
+    <>
+      {/* El escudo en grande detrás de todo: decorativo, no se lee ni recibe clics. */}
+      <div className="fondo-escudo" aria-hidden="true"><Logo titulo="" /></div>
+      <div className="app">
+        <header className="cabecera">
+          <a href="/" className="marca" aria-label="JJ Pachangas, inicio">
+            <Logo className="logo-cabecera" titulo="" />
+            <span className="marca-texto">JJ Pachangas</span>
+          </a>
+        </header>
+        {ruta ? <Pachanga codigo={ruta[1]} /> : <Inicio />}
+      </div>
+    </>
   );
 }

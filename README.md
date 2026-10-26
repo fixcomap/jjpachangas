@@ -6,20 +6,16 @@ los equipos con su color de camiseta y genera la imagen para mandar al grupo.
 
 Front React (Vite) en Cloudflare Pages + API Node (Express) en Cloud Run + Postgres en Neon.
 
-| Entorno | Front | API | Rama |
-|---|---|---|---|
-| Producción | https://jjpachangas.fixcomap.com | https://api-jjpachangas.fixcomap.com | `main` |
-| Desarrollo | https://jjpachangas.dev.fixcomap.com | https://api-jjpachangas.dev.fixcomap.com | `develop` |
-| Local | http://localhost:5173 | http://localhost:3000 | tu rama |
+Producción: próximamente.
 
 ## Estado
 
 | Fase | Qué | |
 |---|---|---|
 | 1 | Esqueleto desplegado: API con `/salud`, front, migraciones | ✅ |
-| 2 | Login con Google, crear pachanga, link público, anotarse, compartir por WhatsApp | ⏳ |
-| 3 | Equipos con color de camiseta e imagen para compartir | |
-| 4 | Aviso al organizador al llenarse el cupo (push y email) | |
+| 2 | Login con Google, crear pachanga, link público, anotarse, compartir por WhatsApp | ✅ |
+| 3 | Equipos con color de camiseta e imagen para compartir | ✅ |
+| 4 | Aviso al organizador al llenarse el cupo (push y email) | ⏳ |
 
 ## Estructura
 
@@ -37,34 +33,15 @@ Requisitos: Node 22+ y Docker.
 ```sh
 cp .env.example .env                                   # y poner una POSTGRES_PASSWORD
 docker compose up -d                                   # Postgres en localhost:5432
-(cd apps/api && npm ci && npm run migrar && npm run dev)   # API en :3000
+(cd apps/api && npm ci && npm run migrar && DEV_USER=tu@email npm run dev)   # API en :3000
 (cd apps/web && npm ci && npm run dev)                     # front en http://localhost:5173
 ```
 
 Vite reenvía `/api/*` a la API sin el prefijo. En Pages, el front llama a `VITE_API_URL`.
+`DEV_USER` entra sin Google (solo fuera de producción). El login con Google se prueba en desarrollo.
+Tests: `(cd apps/api && npm test)`.
 
-## Cómo se despliega
+## Despliegue
 
-Este repo no tiene pipeline propio: `.github/workflows/ci.yml` llama al pipeline estándar de
-[`fixcomap/platform`](https://github.com/fixcomap/platform), que lee
-[`catalog/jjpachangas.yaml`](https://github.com/fixcomap/platform/blob/main/catalog/jjpachangas.yaml).
-
-| Evento | Qué pasa |
-|---|---|
-| PR a `develop` o `main` | gitflow, gitleaks + trivy + higiene, `npm ci` + build de `apps/api` y `apps/web`, imagen + trivy |
-| Merge a `develop` | migraciones en `jjpachangas_dev`, API en `jjpachangas-dev`, front en Pages (rama `develop`) |
-| Merge a `main` | lo mismo en producción tras aprobar el environment `production`; tag `vX.Y.Z` de `VERSION` |
-
-GitFlow: `feature/*` → `develop` (PR, checks en verde); `release/x.y.z` → `main`; después, back-merge.
-
-## Configuración en Cloud Run
-
-| Variable | Origen |
-|---|---|
-| `DATABASE_URL` | secreto `jjpachangas[-dev]-database-url` (cadena *pooled* de Neon, rol `jjpachangas`) |
-| `SESSION_SECRET` | secreto `jjpachangas[-dev]-session-secret` (32+ caracteres al azar) |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | secretos del cliente OAuth de Google (fase 2) |
-| `FRONT_URL`, `API_URL` | catálogo: primer hostname del entorno |
-| `NODE_ENV`, `PORT` | `Dockerfile` |
-
-Migraciones: secreto `jjpachangas[-dev]-database-url-direct` (cadena directa, sin pooler).
+Pipeline estándar de [fixcomap/platform](https://github.com/fixcomap/platform): PR → checks;
+`develop` → entorno de desarrollo (privado); `main` → producción con aprobación.

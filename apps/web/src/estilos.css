@@ -1,0 +1,247 @@
+/* Estilo cartel de partido: fondo casi negro, amarillo neón, títulos condensados
+   en cursiva con textura gastada y nombres escritos con tiza. Las fuentes van en
+   el bundle (@fontsource): sin peticiones a terceros. */
+:root {
+  --fondo: #0a0b0a;
+  --panel: #151816;
+  --borde: #262b27;
+  --texto: #f2f2ee;
+  --tenue: #9aa09b;
+  --neon: #d9ff2e;
+  --whatsapp: #25d366;
+  --rojo: #ff6b5e;
+  --titulo: 'Anton', 'Impact', 'Arial Narrow', sans-serif;
+  --tiza: 'Cabin Sketch', 'Chalkboard SE', 'Chalkduster', cursive;
+  /* Ruido que hace de máscara: deja huecos al azar, como pintura gastada o tiza. */
+  --gastado: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -22 14.6'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='1' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2 1.85'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--texto);
+  background: var(--fondo);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  /* Luz de estadio desde arriba */
+  background: radial-gradient(ellipse 90% 45% at 50% -8%, #2b322c 0%, rgba(10, 11, 10, 0) 70%), var(--fondo);
+}
+.app { max-width: 560px; margin: 0 auto; padding: 0 16px 56px; }
+.cabecera { padding: 14px 0 0; }
+.marca { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-cabecera { display: block; width: 40px; height: auto; flex: none; }
+/* Mismo estilo que el lugar del cartel: neón, condensada, cursiva y gastada. */
+.marca-texto {
+  font-family: var(--titulo);
+  font-style: italic;
+  font-size: 1.9rem;
+  line-height: 1;
+  padding-top: 0.08em;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--neon);
+  transform: skewX(-8deg);
+  -webkit-mask-image: var(--gastado);
+  mask-image: var(--gastado);
+}
+/* Escudo de fondo: fijo, centrado y tenue; por debajo del contenido. */
+.fondo-escudo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 0.07;
+}
+.fondo-escudo svg { width: min(115vw, 760px); height: auto; }
+.app { position: relative; z-index: 1; }
+.marca { font-family: var(--titulo); font-size: 1.05rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--texto); text-decoration: none; }
+.marca span { color: var(--neon); }
+h2 { font-family: var(--titulo); font-weight: 400; text-transform: uppercase; letter-spacing: 1px; font-size: 1.3rem; margin: 28px 0 10px; }
+.centro { text-align: center; margin-top: 10vh; }
+.tenue { color: var(--tenue); }
+.error { color: var(--rojo); }
+
+/* ---------- cartel ("PARTIDITO EN / <lugar>") ---------- */
+.cartel { text-align: center; padding: 26px 0 8px; }
+.cartel-pre {
+  margin: 0;
+  font-family: var(--titulo);
+  font-style: italic;
+  font-size: clamp(1.4rem, 7vw, 2.1rem);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transform: skewX(-6deg);
+}
+.cartel-grande {
+  margin: 0;
+  font-family: var(--titulo);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(2.8rem, 16vw, 5.2rem);
+  line-height: 1.05;
+  padding-top: 0.08em;
+  text-transform: uppercase;
+  color: var(--neon);
+  transform: skewX(-8deg);
+  overflow-wrap: anywhere;
+  -webkit-mask-image: var(--gastado);
+  mask-image: var(--gastado);
+}
+.cartel-grande.largo { font-size: clamp(2rem, 10vw, 3.4rem); }
+.chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 18px 0 6px; }
+.chips span {
+  padding: 6px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--panel);
+  font-size: 0.95rem;
+}
+.organiza { margin: 6px 0 0; color: var(--tenue); font-size: 0.9rem; }
+
+/* ---------- botones y formularios ---------- */
+.boton {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--neon);
+  color: #111;
+  font-family: var(--titulo);
+  font-size: 1.15rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.boton:disabled { opacity: 0.55; }
+.boton.whatsapp { background: var(--whatsapp); color: #062a14; }
+.boton.secundario { background: transparent; color: var(--neon); border: 1px solid var(--neon); }
+.acciones { margin: 18px 0 4px; }
+.enlace { background: none; border: 0; color: var(--neon); padding: 0; font: inherit; cursor: pointer; text-decoration: underline; }
+.tarjeta { background: var(--panel); border: 1px solid var(--borde); border-radius: 14px; padding: 16px; margin: 14px 0; }
+.tarjeta h2 { margin-top: 0; }
+label { display: block; font-size: 0.85rem; color: var(--tenue); margin: 10px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+input {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px;
+  font-size: 1rem;
+  color: var(--texto);
+  background: #0e100f;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+}
+input:focus { outline: 2px solid var(--neon); outline-offset: 1px; }
+.fila { display: flex; gap: 8px; }
+/* Deporte y modalidad: botones tipo píldora; la elegida, en neón. */
+.opciones { border: 0; padding: 0; margin: 12px 0 4px; display: flex; flex-wrap: wrap; gap: 8px; }
+.opciones legend { width: 100%; padding: 0; margin-bottom: 8px; font-size: 0.85rem; color: var(--tenue); text-transform: uppercase; letter-spacing: 0.5px; }
+.opciones button {
+  flex: 1 1 auto;
+  min-width: 88px;
+  padding: 10px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: #0e100f;
+  color: var(--texto);
+  font-size: 1rem;
+  cursor: pointer;
+}
+.opciones button small { display: block; margin-top: 2px; font-size: 0.75rem; color: var(--tenue); }
+.opciones button.activa { border-color: var(--neon); color: var(--neon); box-shadow: inset 0 0 0 1px var(--neon); }
+.opciones button.activa small { color: var(--neon); }
+.fila label { flex: 1; min-width: 0; }
+.anotado {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--neon);
+  border-radius: 12px;
+  color: var(--neon);
+  text-align: center;
+}
+.anotado p { margin: 0; }
+.anotado small { display: block; margin-top: 8px; color: var(--tenue); }
+.boton.baja { background: transparent; color: var(--rojo); border: 1px solid var(--rojo); font-size: 1rem; padding: 10px; }
+.tiza li.mio .nombre { color: var(--neon); text-shadow: 0 0 6px rgba(217, 255, 46, 0.35); }
+
+/* ---------- lista escrita con tiza ---------- */
+.tiza { margin: 26px 0 8px; }
+.tiza-titulo { display: flex; justify-content: space-between; align-items: baseline; }
+.tiza-titulo h2 { margin: 0; }
+.tiza-titulo .cuenta { font-family: var(--titulo); font-size: 1.6rem; color: var(--neon); }
+.tiza ol { list-style: none; padding: 0; margin: 10px 0 0; }
+.tiza li {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 2px;
+  font-family: var(--tiza);
+  font-size: 1.45rem;
+  border-bottom: 1px solid rgba(242, 242, 238, 0.06);
+}
+.tiza .numero { width: 34px; text-align: right; opacity: 0.55; }
+.tiza .nombre {
+  color: #f4f4ef;
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.55), 0 0 6px rgba(255, 255, 255, 0.12);
+  -webkit-mask-image: var(--grano);
+  mask-image: var(--grano);
+}
+.tiza .libre .nombre { opacity: 0.22; letter-spacing: 3px; }
+.tiza h3 { font-family: var(--titulo); font-weight: 400; text-transform: uppercase; letter-spacing: 1px; color: var(--tenue); margin: 22px 0 0; }
+.quitar { margin-left: auto; background: none; border: 0; color: var(--rojo); font-size: 1.4rem; cursor: pointer; font-family: system-ui, sans-serif; }
+
+/* ---------- inicio ---------- */
+.hero { text-align: center; padding: 3vh 0 12px; }
+.hero > p:not(.cartel-pre) { color: var(--tenue); margin: 18px 0 26px; font-size: 1.05rem; }
+.lista { list-style: none; padding: 0; margin: 0; }
+.lista li { display: flex; align-items: center; gap: 6px; }
+.lista li a { flex: 1; }
+.boton.eliminar { margin-top: 18px; }
+.lista li a {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px;
+  margin: 8px 0;
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+.lista strong { font-family: var(--titulo); font-weight: 400; text-transform: uppercase; letter-spacing: 0.5px; font-size: 1.1rem; }
+.lista .contador { font-family: var(--titulo); color: var(--neon); font-size: 1.2rem; white-space: nowrap; }
+.hola { color: var(--tenue); margin: 6px 0 0; }
+
+/* ---------- equipos ---------- */
+.muestra { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.4); vertical-align: -2px; }
+.colores button { min-width: 0; flex: 1 1 70px; padding: 10px 6px; font-size: 0.9rem; white-space: nowrap; }
+.reparto-cabecera { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+.reparto-cabecera legend { font-size: 0.85rem; color: var(--tenue); text-transform: uppercase; letter-spacing: 0.5px; }
+.reparto { list-style: none; padding: 0; margin: 8px 0 0; }
+.reparto li { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--borde); }
+.reparto li span { flex: 1; font-family: var(--tiza); font-size: 1.2rem; }
+.reparto button { min-width: 74px; padding: 7px 10px; border: 1px solid var(--borde); border-radius: 10px; background: #0e100f; color: var(--tenue); cursor: pointer; }
+.reparto button.activa { border-color: var(--neon); font-weight: 600; }
+.equipos .columnas { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.equipos .columna h3 { font-family: var(--titulo); font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 6px; color: var(--neon); }
+.equipos .columna ul { list-style: none; padding: 0; margin: 0; font-family: var(--tiza); font-size: 1.25rem; }
+.equipos .columna li { padding: 3px 0; }
+
+/* ---------- desafío ---------- */
+.versus { margin: 14px 0 0; font-family: var(--titulo); font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.versus span { color: var(--neon); margin: 0 8px; font-style: italic; }
+.muestra.grande { width: 18px; height: 18px; vertical-align: -1px; }
+.grupos .tiza { margin-top: 22px; }
+.panel-desafio .grupo-panel { padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--borde); }
+.panel-desafio .capitan h3 { font-family: var(--titulo); font-weight: 400; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px; }
+.panel-desafio small { display: block; margin-top: 6px; }
+.opciones button:disabled { opacity: 0.3; cursor: not-allowed; }
