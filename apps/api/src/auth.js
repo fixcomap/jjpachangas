@@ -13,10 +13,8 @@ const URL_CALLBACK = `${config.apiUrl}/auth/callback`;
 
 // Front (jjpachangas.*) y API (api-jjpachangas.*) son el mismo sitio (fixcomap.com):
 // con SameSite=Lax la cookie viaja en los fetch del front y en la vuelta desde Google.
-function opcionesCookie(maxAge) {
-  // Secure siempre: los navegadores también la aceptan en http://localhost.
-  return { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge };
-}
+// Cookies: httpOnly, Secure siempre (los navegadores la aceptan en http://localhost) y
+// SameSite=Lax; escritas en cada res.cookie para que el análisis estático las vea.
 
 // Entorno restringido: solo los emails de ACCESO_EMAILS (sesiones viejas incluidas).
 const puedeEntrar = (email) => !config.accesoEmails.length || config.accesoEmails.includes(String(email).toLowerCase());
@@ -29,7 +27,7 @@ async function abrirSesion(res, usuarioId) {
     `INSERT INTO sesiones (token_hash, usuario_id, vence_en) VALUES ($1, $2, now() + $3 * interval '1 millisecond')`,
     [hash(token), usuarioId, DURACION_SESION_MS]
   );
-  res.cookie(COOKIE_SESION, token, opcionesCookie(DURACION_SESION_MS));
+  res.cookie(COOKIE_SESION, token, { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: DURACION_SESION_MS });
 }
 
 async function guardarUsuario({ sub, email, nombre }) {
@@ -77,7 +75,7 @@ router.get('/login', async (req, res, next) => {
       return res.redirect(config.frontUrl);
     }
     const estado = crypto.randomBytes(16).toString('hex');
-    res.cookie(COOKIE_ESTADO, estado, opcionesCookie(10 * 60 * 1000));
+    res.cookie(COOKIE_ESTADO, estado, { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: 10 * 60 * 1000 });
     const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
     url.search = new URLSearchParams({
       client_id: config.googleClientId,
