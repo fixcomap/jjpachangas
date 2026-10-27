@@ -14,7 +14,8 @@ const URL_CALLBACK = `${config.apiUrl}/auth/callback`;
 // Front (jjpachangas.*) y API (api-jjpachangas.*) son el mismo sitio (fixcomap.com):
 // con SameSite=Lax la cookie viaja en los fetch del front y en la vuelta desde Google.
 function opcionesCookie(maxAge) {
-  return { httpOnly: true, secure: config.esProduccion, sameSite: 'lax', path: '/', maxAge };
+  // Secure siempre: los navegadores también la aceptan en http://localhost.
+  return { httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge };
 }
 
 // Entorno restringido: solo los emails de ACCESO_EMAILS (sesiones viejas incluidas).
