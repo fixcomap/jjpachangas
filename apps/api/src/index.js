@@ -61,6 +61,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Algo salió mal. Probá de nuevo en un rato.' });
 });
 
-app.listen(config.puerto, () => {
-  console.log(`API escuchando en el puerto ${config.puerto}`);
-});
+// Ejecutada directamente (Cloud Run, npm run dev) escucha; requerida (tests), solo exporta la app.
+if (require.main === module) {
+  app.listen(config.puerto, () => {
+    console.log(`API escuchando en el puerto ${config.puerto}`);
+  });
+}
+
+module.exports = app;
