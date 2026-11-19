@@ -37,6 +37,10 @@ test('API contra Postgres', { skip: !conBase && 'sin DATABASE_URL' }, async (t) 
     assert.strictEqual((await pedir('/salud')).status, 200);
   });
 
+  await t.test('vivo: responde sin tocar la base', async () => {
+    assert.strictEqual((await pedir('/vivo')).status, 200);
+  });
+
   let codigo;
   await t.test('crear: el cupo sale de la modalidad; sin sesión 401', async () => {
     const nueva = { deporte: 'Pádel dúos', empieza_en: enDias(2), lugar: 'Club de prueba' };
